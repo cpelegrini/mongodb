@@ -8,19 +8,18 @@ How to backup periodically and send to S3 repository.
 
    * File name: backup_mongo.sh
    ```bash
-   dbName=$1
-   dbUser=User # user name
-   dbPass=123456 # user password
-   path=~/backups/db
-   var=`date +"%FORMAT_STRING"`
-   now=`date +"%m_%d_%Y"`
-   now=`date +"%Y-%m-%d-%I"`
-   echo "${now}"
-   docker exec mongodb sh -c \ 
-      "mongodump --authenticationDatabase admin -u ${dbUser} -p ${dbPass} --db=${dbName} --archive" \
-      > ${path}-${now}.dump
-   # delete backup files older than 30 day
-   find ~/backups/*.dump -mtime +30 -delete
+      dbName=$1
+      dbUser=User # user name
+      dbPass="password" # user password
+      var=`date +"%FORMAT_STRING"`
+      now=`date +"%m_%d_%Y"`
+      now=`date +"%Y-%m-%d-%I"`
+      path="/home/user/backups_mongo"
+      fileName="${path}/${dbName}-${now}.dump"
+      docker exec vialize-db sh -c "mongodump --authenticationDatabase admin -u ${dbUser} -p '${dbPass}' --db=${dbName} --archive" > "${fileName}"
+      # delete backup files older than 30 day
+      cd ${path}
+      find *.dump -mtime +30 -delete
    ```
 
    * How to use:
@@ -34,7 +33,7 @@ How to backup periodically and send to S3 repository.
    crontab -e
 
    # backup mongo every hour at minute 0
-   0 * * * * ~/backup_mongo.sh
+   0 * * * * /home/user/backups_mongo.sh
    ```
    
 
